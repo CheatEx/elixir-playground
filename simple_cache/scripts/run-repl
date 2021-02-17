@@ -1,0 +1,5 @@
+#!/bin/bash
+
+NODE=${1:-"A"}
+
+iex --sname "simple_cache_${NODE}" -S mix
