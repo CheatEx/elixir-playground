@@ -25,6 +25,7 @@ defmodule SimpleCache.EventManager do
       restart: :temporary,
       shutdown: :brutal_kill
     }
+
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
@@ -48,6 +49,7 @@ defmodule SimpleCache.EventManager do
     for {_, pid, _, _} <- DynamicSupervisor.which_children(__MODULE__) do
       GenServer.cast(pid, msg)
     end
+
     :ok
   end
 end

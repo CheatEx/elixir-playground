@@ -13,6 +13,7 @@ defmodule SimpleCache.App do
       {Sup, []},
       {EventManager, []}
     ]
+
     Supervisor.start_link(children, strategy: :one_for_one, name: SimpleCache.App.Root)
   end
 end

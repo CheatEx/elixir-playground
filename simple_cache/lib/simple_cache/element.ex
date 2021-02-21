@@ -63,6 +63,7 @@ defmodule SimpleCache.Element do
     now = :calendar.local_time()
     current_time = :calendar.datetime_to_gregorian_seconds(now)
     elapsed_time = current_time - start_time
+
     case lease_time - elapsed_time do
       t when t > 0 -> t * 1000
       _ -> 0

@@ -21,6 +21,7 @@ defmodule SimpleCache.Sup do
       start: {Element, :start_link, [value, lease_time]},
       restart: :temporary
     }
+
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 
