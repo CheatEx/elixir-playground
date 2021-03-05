@@ -6,6 +6,7 @@ defmodule SimpleCache do
 
   @default_lease_time 60 * 60 * 24
 
+  @spec insert(term(), term()) :: :ok
   def insert(key, value) do
     case Store.lookup(key) do
       {:ok, pid} ->
@@ -18,6 +19,7 @@ defmodule SimpleCache do
     end
   end
 
+  @spec lookup(term()) :: {:ok, term()} | {:error, atom()}
   def lookup(key) do
     with {:ok, pid} <- Store.lookup(key),
          {:ok, value} <- Element.fetch(pid) do
@@ -28,6 +30,7 @@ defmodule SimpleCache do
     end
   end
 
+  @spec delete(term()) :: :ok | {:error, atom()}
   def delete(key) do
     case Store.lookup(key) do
       {:ok, pid} ->

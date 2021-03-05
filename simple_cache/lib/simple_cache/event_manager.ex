@@ -1,23 +1,6 @@
 defmodule SimpleCache.EventManager do
   use DynamicSupervisor
 
-  def child_spec(arg) do
-    %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [arg]},
-      restart: :permanent
-    }
-  end
-
-  def start_link(arg) do
-    DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
-  end
-
-  @impl true
-  def init(_arg) do
-    DynamicSupervisor.init(strategy: :one_for_one)
-  end
-
   def add_handler(handler_module, init_arg) do
     child_spec = %{
       id: handler_module,
@@ -49,5 +32,22 @@ defmodule SimpleCache.EventManager do
       GenServer.cast(pid, msg)
     end
     :ok
+  end
+
+  def child_spec(arg) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [arg]},
+      restart: :permanent
+    }
+  end
+
+  def start_link(arg) do
+    DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
+  end
+
+  @impl true
+  def init(_arg) do
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 end

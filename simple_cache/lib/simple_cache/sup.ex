@@ -3,6 +3,17 @@ defmodule SimpleCache.Sup do
 
   use DynamicSupervisor
 
+  @spec start_child(term(), pos_integer()) :: DynamicSupervisor.on_start_child()
+  def start_child(value, lease_time) do
+    spec = %{
+      id: Element,
+      start: {Element, :start_link, [value, lease_time]},
+      restart: :temporary
+    }
+    DynamicSupervisor.start_child(__MODULE__, spec)
+  end
+
+  @spec child_spec(term()) :: Supervisor.child_spec()
   def child_spec(arg) do
     %{
       id: __MODULE__,
@@ -11,17 +22,9 @@ defmodule SimpleCache.Sup do
     }
   end
 
+  @spec start_link(term()) :: Supervisor.on_start()
   def start_link(arg) do
     DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
-  end
-
-  def start_child(value, lease_time) do
-    spec = %{
-      id: Element,
-      start: {Element, :start_link, [value, lease_time]},
-      restart: :temporary
-    }
-    DynamicSupervisor.start_child(__MODULE__, spec)
   end
 
   @impl true

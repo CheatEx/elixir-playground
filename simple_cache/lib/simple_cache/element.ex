@@ -3,14 +3,6 @@ defmodule SimpleCache.Element do
 
   use GenServer
 
-  defmodule State do
-    defstruct value: nil, lease_time: nil, start_time: nil
-  end
-
-  def start_link(value, lease_time) do
-    GenServer.start_link(__MODULE__, [value, lease_time])
-  end
-
   def fetch(pid) do
     GenServer.call(pid, :fetch)
   end
@@ -21,6 +13,14 @@ defmodule SimpleCache.Element do
 
   def delete(pid) do
     GenServer.cast(pid, :delete)
+  end
+
+  def start_link(value, lease_time) do
+    GenServer.start_link(__MODULE__, [value, lease_time])
+  end
+
+  defmodule State do
+    defstruct value: nil, lease_time: nil, start_time: nil
   end
 
   @impl true
