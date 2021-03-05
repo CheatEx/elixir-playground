@@ -12,6 +12,7 @@ defmodule SimpleCache do
       {:ok, pid} ->
         Element.replace(pid, value)
         EventManager.notify_replace(key, value)
+
       {:error, _} ->
         {:ok, pid} = Sup.start_child(value, @default_lease_time)
         Store.insert(key, pid)
@@ -36,8 +37,12 @@ defmodule SimpleCache do
       {:ok, pid} ->
         EventManager.notify_delete(key)
         Element.delete(pid)
-      {:error, :not_found} -> :ok
-      _ -> {:error, :other}
+
+      {:error, :not_found} ->
+        :ok
+
+      _ ->
+        {:error, :other}
     end
   end
 end
