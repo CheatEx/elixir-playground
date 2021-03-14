@@ -8,10 +8,12 @@ defmodule SimpleCache.App do
   @impl true
   def start(_type, _args) do
     Store.init()
+    port = Application.get_env(:simple_cache, :tcp_port, 1155)
 
     children = [
       {Sup, []},
-      {EventManager, []}
+      {EventManager, []},
+      {SimpleCache.Tcp.Sup, port}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: SimpleCache.App.Root)
