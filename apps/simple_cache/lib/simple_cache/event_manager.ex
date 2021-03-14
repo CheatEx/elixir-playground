@@ -4,7 +4,7 @@ defmodule SimpleCache.EventManager do
   def add_handler(handler_module, init_arg) do
     child_spec = %{
       id: handler_module,
-      start: {handler_module, :start_link, init_arg},
+      start: {handler_module, :start_link, [init_arg]},
       restart: :temporary,
       shutdown: :brutal_kill
     }

@@ -1,5 +1,5 @@
-defmodule SimpleCache.Tcp.Server do
-  alias SimpleCache.Tcp.Listener
+defmodule SimpleCacheServer.Tcp.Server do
+  alias SimpleCacheServer.Tcp.Listener
 
   use GenServer
 
@@ -27,6 +27,6 @@ defmodule SimpleCache.Tcp.Server do
   end
 
   defp start_listener(lsock) do
-    DynamicSupervisor.start_child(SimpleCache.Tcp.LSup, {Listener, {self(), lsock}})
+    DynamicSupervisor.start_child(SimpleCacheServer.Tcp.LSup, {Listener, {self(), lsock}})
   end
 end

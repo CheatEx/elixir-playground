@@ -1,4 +1,4 @@
-defmodule SimpleCache.Tcp.Sup do
+defmodule SimpleCacheServer.Tcp.Sup do
   use Supervisor
 
   def start_link(arg) do
@@ -8,8 +8,8 @@ defmodule SimpleCache.Tcp.Sup do
   @impl true
   def init(arg) do
     children = [
-      {DynamicSupervisor, strategy: :one_for_one, name: SimpleCache.Tcp.LSup},
-      {SimpleCache.Tcp.Server, arg}
+      {DynamicSupervisor, strategy: :one_for_one, name: SimpleCacheServer.Tcp.LSup},
+      {SimpleCacheServer.Tcp.Server, arg}
     ]
 
     Supervisor.init(children, strategy: :one_for_all)

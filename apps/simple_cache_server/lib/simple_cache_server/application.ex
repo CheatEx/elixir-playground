@@ -3,13 +3,12 @@ defmodule SimpleCacheServer.Application do
 
   @impl true
   def start(_type, _args) do
+    port = Application.get_env(:simple_cache_sercer, :tcp_port, 1155)
+
     children = [
-      # Starts a worker by calling: SimpleCacheServer.Worker.start_link(arg)
-      # {SimpleCacheServer.Worker, arg}
+      {SimpleCacheServer.Tcp.Sup, port}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: SimpleCacheServer.Supervisor]
     Supervisor.start_link(children, opts)
   end
