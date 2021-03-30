@@ -3,7 +3,7 @@ defmodule GenWebServer.SocketServer do
 
   use GenServer
 
-  defstruct port: nil, conn_sup: nil, lsock: nil
+  defstruct port: nil, conn_sup: nil, lsock: nil, callback_module: nil, user_arg: nil
 
   @spec start_link([port: pos_integer(), conn_sup: pid() | atom()]) :: GenServer.on_start()
   def start_link(params) do
@@ -19,19 +19,26 @@ defmodule GenWebServer.SocketServer do
   def init(params) do
     port = Keyword.fetch!(params, :port)
     conn_sup = Keyword.fetch!(params, :conn_sup)
-    {:ok, lsock} = :gen_tcp.listen(port, active: true)
-    start_listener(lsock, conn_sup)
-    state = %SocketServer{port: port, conn_sup: conn_sup, lsock: lsock}
+    callback_module = Keyword.fetch!(params, :callback_module)
+    user_arg = Keyword.fetch!(params, :user_arg)
+    {:ok, lsock} = :gen_tcp.listen(port, active: false, packet: :http_bin, reuseaddr: true)
+    state = %SocketServer{
+      port: port,
+      conn_sup: conn_sup,
+      lsock: lsock,
+      callback_module: callback_module,
+      user_arg: user_arg}
+    start_listener(state)
     {:ok, state}
   end
 
   @impl true
-  def handle_cast({:accepted, lsock}, %SocketServer{conn_sup: conn_sup, lsock: lsock} = state) do
-    start_listener(lsock, conn_sup)
+  def handle_cast({:accepted, lsock}, %SocketServer{lsock: lsock} = state) do
+    start_listener(state)
     {:noreply, state}
   end
 
-  defp start_listener(lsock, conn_sup) do
-    DynamicSupervisor.start_child(conn_sup, {ConnectionHandler, {self(), lsock}})
+  defp start_listener(%SocketServer{conn_sup: conn_sup, lsock: lsock, callback_module: callback_module, user_arg: user_arg} = state) do
+    DynamicSupervisor.start_child(conn_sup, {ConnectionHandler, {self(), lsock, callback_module, user_arg}})
   end
 end

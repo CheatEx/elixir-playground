@@ -11,7 +11,7 @@ defmodule GenWebServer do
 
   @spec start_link(module(), pos_integer(), term()) :: GenServer.on_start()
   def start_link(callback_module, port, user_arg) do
-
+    Supervisor.start_link(GenWebServer.Sup, {callback_module, port, user_arg})
   end
 
   @spec reply(pos_integer()) :: reply

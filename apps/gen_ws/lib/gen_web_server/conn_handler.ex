@@ -3,37 +3,57 @@ defmodule GenWebServer.ConnectionHandler do
 
   use GenServer, restart: :transient
 
-  # TODO get spec
-  # @spec start_link(list()) :: GenServer.on_start()
-  def start_link({server, _lsock} = arg) when is_pid(server) do
+  defstruct server: nil, lsock: nil, sock: nil, request_line: nil, headers: [], body: "", content_remainig: 0, callback_module: nil, user_arg: nil
+
+  @spec start_link({pid(), :gen_tcp.socket(), module(), term()}) :: GenServer.on_start()
+  def start_link(arg) do
     GenServer.start_link(__MODULE__, arg)
   end
 
   @impl true
-  def init({server, lsock}) do
-    {:ok, {server, lsock}, {:continue, []}}
+  def init({server, lsock, callback_module, user_arg}) do
+    state = %ConnectionHandler{
+      server: server,
+      lsock: lsock,
+      callback_module: callback_module,
+      user_arg: user_arg}
+    {:ok, state, {:continue, []}}
   end
 
   @impl true
-  def handle_continue(_arg, {server, lsock} = state) do
-    {:ok, _sock} = :gen_tcp.accept(lsock)
+  def handle_continue(_arg, %ConnectionHandler{server: server, lsock: lsock} = state) do
+    {:ok, sock} = :gen_tcp.accept(lsock)
     SocketServer.accepted(server, lsock)
+    :inet.setopts(sock, active: once)
+    {:noreply, %{state | sock: sock}}
+  end
+
+  @impl true
+  def handle_info({:http, _sock, {:http_request, _, _, _} = request}, state) do
+    :inet.setopts(state.sock, active: once)
+    {:noreply, %{state | request_line: request}}
+  end
+  @impl true
+  def handle_info({:http, _sock, {:http_header, _, name, _, value}}, state) do
+    :inet.setopts(state.sock, active: once)
+    {:noreply, process_header(name, value, state)}
+  end
+  @impl true
+  def handle_info({:http, _sock, :http_eoh}, %ConnectionHandler{content_remainig: 0} = state) do
+    {:stop, :normal, handle_request(state)}
+  end
+  @impl true
+  def handle_info({:http, _sock, :http_eoh}, state) do
+    :inet.setopts(state.sock, active: :once, packet: :raw)
     {:noreply, state}
   end
-
   @impl true
-  def handle_info({:tcp, socket, data}, state) do
-    new_state = handle_data(socket, data, state)
-    {:noreply, new_state}
+  def handle_info({:tcp, _sock, data}, state) do
+    # TODO
   end
 
   @impl true
   def handle_info({:tcp_closed, _socket}, state) do
     {:stop, :normal, state}
-  end
-
-  defp handle_data(socket, data, state) do
-    :gen_tcp.send(socket, data)
-    state
   end
 end
