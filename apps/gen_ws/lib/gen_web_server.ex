@@ -16,12 +16,10 @@ defmodule GenWebServer do
 
   @spec reply(pos_integer()) :: reply
   def reply(code) do
-
   end
 
   @spec reply(pos_integer(), String.t() | binary() | iolist()) :: reply
   def reply(code, body) when is_binary(body) do
-
   end
 
   def reply(code, body) do

@@ -10,11 +10,14 @@ defmodule GenWebServer.Sup do
     conn_sup_name =
       "#{Atom.to_string(GenWebServer.ListenerSupervisor)}_#{Integer.to_string(port)}"
       |> String.to_atom()
+
     server_init_arg = [
       port: port,
       conn_sup: conn_sup_name,
       callback_module: callback_module,
-      user_arg: user_arg]
+      user_arg: user_arg
+    ]
+
     children = [
       {DynamicSupervisor, strategy: :one_for_one, name: conn_sup_name},
       {GenWebServer.SocketServer, server_init_arg}
