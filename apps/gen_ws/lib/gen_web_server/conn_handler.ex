@@ -33,7 +33,7 @@ defmodule GenWebServer.ConnectionHandler do
   @impl true
   def handle_continue(_arg, %State{server: server, lsock: lsock} = state) do
     {:ok, sock} = :gen_tcp.accept(lsock)
-    # GenWebServer.SocketServer.accepted(server, lsock)
+    GenWebServer.SocketServer.accepted(server, lsock)
     :inet.setopts(sock, active: :once)
     {:noreply, %{state | sock: sock}}
   end
@@ -86,13 +86,51 @@ defmodule GenWebServer.ConnectionHandler do
   end
 
   defp process_header("Expect" = name, "100-continue" = value, state) do
-    # TODO :gen_tcp.s
+    :gen_tcp.send(state.sock, GenWebServer.reply(100))
     %State{state | headers: [{name, value} | state.headers]}
   end
 
   defp process_header(name, value, state) do
+    %State{state | headers: [{name, value} | state.headers]}
   end
 
-  defp handle_request(state) do
+  defp handle_request(
+         state = %State{
+           request_line: request_line,
+           headers: headers,
+           body: body,
+           user_arg: user_arg,
+           callback_module: callback_module,
+           sock: sock
+         }
+       ) do
+    {:http_request, method, _, _} = request_line
+    reply = dispatch(method, request_line, headers, body, callback_module, user_arg)
+    :gen_tcp.send(sock, reply)
+    state
+  end
+
+  defp dispatch("GET", request_line, headers, _body, callback_module, user_arg) do
+    callback_module.get(request_line, headers, user_arg)
+  end
+
+  defp dispatch("DELETE", request_line, headers, _body, callback_module, user_arg) do
+    callback_module.delete(request_line, headers, user_arg)
+  end
+
+  defp dispatch("HEAD", request_line, headers, _body, callback_module, user_arg) do
+    callback_module.delete(request_line, headers, user_arg)
+  end
+
+  defp dispatch("POST", request_line, headers, body, callback_module, user_arg) do
+    callback_module.poet(request_line, headers, body, user_arg)
+  end
+
+  defp dispatch("PUT", request_line, headers, body, callback_module, user_arg) do
+    callback_module.put(request_line, headers, body, user_arg)
+  end
+
+  defp dispatch(other, request_line, headers, body, callback_module, user_arg) do
+    callback_module.other(other, request_line, headers, body, user_arg)
   end
 end
