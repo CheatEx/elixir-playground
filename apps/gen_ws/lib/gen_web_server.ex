@@ -1,5 +1,5 @@
 defmodule GenWebServer do
-  @type path :: String.t()
+  @type request :: term()
   @type method :: String.t()
   @type headers :: [{String.t(), String.t()}]
   @type reply :: term()
@@ -7,12 +7,12 @@ defmodule GenWebServer do
   @type body :: binary()
 
   @callback init(term()) :: {:ok, user_data}
-  @callback get(path, headers, user_data) :: :ok
-  @callback delete(path, headers, user_data) :: :ok
-  @callback head(path, headers, user_data) :: :ok
-  @callback post(path, headers, body, user_data) :: :ok
-  @callback put(path, headers, body, user_data) :: :ok
-  @callback other(method, path, headers, body, user_data) :: :ok
+  @callback get(request, headers, user_data) :: :ok
+  @callback delete(request, headers, user_data) :: :ok
+  @callback head(request, headers, user_data) :: :ok
+  @callback post(request, headers, body, user_data) :: :ok
+  @callback put(request, headers, body, user_data) :: :ok
+  @callback other(method, request, headers, body, user_data) :: :ok
 
   @spec start_link(module(), pos_integer(), term()) :: GenServer.on_start()
   def start_link(callback_module, port, user_arg) do
@@ -25,7 +25,7 @@ defmodule GenWebServer do
   @spec reply(pos_integer(), iodata()) :: reply
   def reply(code, body), do: reply(code, [{"Content-Type", "text"}], body)
 
-  @spec reply(pos_integer(), [], iodata()) :: reply
+  @spec reply(pos_integer(), headers, iodata()) :: reply
   def reply(code, headers, body) when is_binary(body) do
     length = IO.iodata_length(body)
 

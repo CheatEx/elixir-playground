@@ -104,33 +104,33 @@ defmodule GenWebServer.ConnectionHandler do
            sock: sock
          }
        ) do
-    {:http_request, method, _, _} = request_line
-    reply = dispatch(method, request_line, headers, body, callback_module, user_arg)
+    {:http_request, method, uri, _} = request_line
+    reply = dispatch(method, uri, headers, body, callback_module, user_arg)
     :gen_tcp.send(sock, reply)
     state
   end
 
-  defp dispatch("GET", request_line, headers, _body, callback_module, user_arg) do
-    callback_module.get(request_line, headers, user_arg)
+  defp dispatch(:GET, uri, headers, _body, callback_module, user_arg) do
+    callback_module.get(uri, headers, user_arg)
   end
 
-  defp dispatch("DELETE", request_line, headers, _body, callback_module, user_arg) do
-    callback_module.delete(request_line, headers, user_arg)
+  defp dispatch(:DELETE, uri, headers, _body, callback_module, user_arg) do
+    callback_module.delete(uri, headers, user_arg)
   end
 
-  defp dispatch("HEAD", request_line, headers, _body, callback_module, user_arg) do
-    callback_module.delete(request_line, headers, user_arg)
+  defp dispatch(:HEAD, uri, headers, _body, callback_module, user_arg) do
+    callback_module.delete(uri, headers, user_arg)
   end
 
-  defp dispatch("POST", request_line, headers, body, callback_module, user_arg) do
-    callback_module.poet(request_line, headers, body, user_arg)
+  defp dispatch(:POST, uri, headers, body, callback_module, user_arg) do
+    callback_module.poet(uri, headers, body, user_arg)
   end
 
-  defp dispatch("PUT", request_line, headers, body, callback_module, user_arg) do
-    callback_module.put(request_line, headers, body, user_arg)
+  defp dispatch(:PUT, uri, headers, body, callback_module, user_arg) do
+    callback_module.put(uri, headers, body, user_arg)
   end
 
-  defp dispatch(other, request_line, headers, body, callback_module, user_arg) do
-    callback_module.other(other, request_line, headers, body, user_arg)
+  defp dispatch(method, uri, headers, body, callback_module, user_arg) do
+    callback_module.other(method, uri, headers, body, user_arg)
   end
 end
