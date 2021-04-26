@@ -31,6 +31,7 @@ defmodule SimpleCacheServer.Http.Server do
   @impl GenWebServer
   def delete({:abs_path, "/" <> key}, _headers, _user_data) do
     SimpleCache.delete(key)
+    GenWebServer.reply(200)
   end
 
   @impl GenWebServer
