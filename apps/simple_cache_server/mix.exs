@@ -24,7 +24,8 @@ defmodule SimpleCacheServer.MixProject do
 
   defp deps do
     [
-      {:simple_cache, in_umbrella: true}
+      {:simple_cache, in_umbrella: true},
+      {:gen_ws, in_umbrella: true}
     ]
   end
 end

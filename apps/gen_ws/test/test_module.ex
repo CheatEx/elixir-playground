@@ -2,7 +2,7 @@ defmodule TestModule do
   @behaviour GenWebServer
 
   @impl GenWebServer
-  def init(term) do
+  def init(_term) do
     {:ok, []}
   end
 
@@ -25,8 +25,8 @@ defmodule TestModule do
   end
 
   @impl GenWebServer
-  def put({:abs_path, path}, headers, _body, _user_data) do
-    IO.puts("POST #{path} #{inspect(headers)} <body skipped>")
+  def post({:abs_path, path}, headers, _body, _user_data) do
+    IO.puts("PUT #{path} #{inspect(headers)} <body skipped>")
     GenWebServer.reply(200)
   end
 

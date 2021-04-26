@@ -26,6 +26,7 @@ defmodule GenWebServer.SocketServer do
     conn_sup = Keyword.fetch!(params, :conn_sup)
     callback_module = Keyword.fetch!(params, :callback_module)
     user_arg = Keyword.fetch!(params, :user_arg)
+
     {:ok, lsock} = :gen_tcp.listen(port, active: false, packet: :http_bin, reuseaddr: true)
 
     state = %State{

@@ -57,7 +57,7 @@ defmodule GenWebServer.ConnectionHandler do
 
   @impl true
   def handle_info({:http, _sock, :http_eoh}, state) do
-    :inet.setopts(state.sock, active: :once, packet: :raw)
+    :inet.setopts(state.sock, mode: :binary, active: :once, packet: :raw)
     {:noreply, state}
   end
 
@@ -81,7 +81,7 @@ defmodule GenWebServer.ConnectionHandler do
   end
 
   defp process_header("Content-Length" = name, value, state) do
-    content_length = Integer.parse(name)
+    content_length = String.to_integer(value)
     %State{state | content_remainig: content_length, headers: [{name, value} | state.headers]}
   end
 
