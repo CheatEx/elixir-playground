@@ -25,3 +25,6 @@ simple_cache-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+.nix-mix
+.nix-hex
