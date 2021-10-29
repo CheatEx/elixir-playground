@@ -1,5 +1,5 @@
-defmodule SimpleCache.Tcp.Listener do
-  alias SimpleCache.Tcp.Server
+defmodule SimpleCacheServer.Tcp.Listener do
+  alias SimpleCacheServer.Tcp.Server
 
   use GenServer, restart: :temporary
 
