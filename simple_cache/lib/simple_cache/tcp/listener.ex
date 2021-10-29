@@ -1,7 +1,7 @@
 defmodule SimpleCache.Tcp.Listener do
   alias SimpleCache.Tcp.Server
 
-  use GenServer, restart: :transient
+  use GenServer, restart: :temporary
 
   # TODO get spec
   # @spec start_link(list()) :: GenServer.on_start()

@@ -6,7 +6,7 @@ defmodule SimpleCache.App do
   use Application
 
   @impl true
-  def start(_type, _args) do
+  def start(type, args) do
     Store.init()
     port = Application.get_env(:simple_cache, :tcp_port, 1155)
 
